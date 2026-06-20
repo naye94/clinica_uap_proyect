@@ -18,10 +18,6 @@ public class TratamientoRealizado {
     private DiagnosticoTratamiento diagnosticoTratamiento;
 
     @ManyToOne
-    @JoinColumn(name = "id_consentimiento", nullable = false)
-    private Consentimiento consentimiento;
-
-    @ManyToOne
     @JoinColumn(name = "id_diente", nullable = false)
     private Diente diente;
 
@@ -31,12 +27,9 @@ public class TratamientoRealizado {
     @Column(name = "fecha_realizacion")
     private LocalDate fechaRealizacion;
 
-    @Column(name = "estado", length = 30)
-    private String estado;
+    @Column(name = "estado_trata_realizado", length = 30)
+    private String estadoTrataRealizado;
 
     @Column(name = "observaciones")
     private String observaciones;
-
-    @Column(name = "realizado_por")
-    private Integer realizadoPor;
 }

@@ -30,7 +30,7 @@ public class Consentimiento {
     @JoinColumn(name = "id_estudiante", nullable = false)
     private Estudiante estudiante;
 
-    @Column(name = "fecha")
+    @Column(name = "fecha_consentimiento")
     private LocalDateTime fecha;
 
     @Column(name = "decision", length = 20)

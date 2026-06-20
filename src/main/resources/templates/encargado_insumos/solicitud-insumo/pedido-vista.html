@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pedidos · Encargada de Insumos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #006D77;
+      --primary-dark: #005259;
+      --primary-light: #E6F4F5;
+      --success: #10B981;
+      --success-light: #D1FAE5;
+      --warning: #F59E0B;
+      --warning-light: #FEF3C7;
+      --danger: #EF4444;
+      --danger-light: #FEE2E2;
+      --info: #3B82F6;
+      --info-light: #DBEAFE;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --radius: 1rem;
+      --radius-sm: 0.75rem;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(135deg, #F5F7FA 0%, #F0F4F8 100%);
+      color: var(--gray-800);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #006D77 0%, #004d44 100%);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      color: white;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+-align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header p {
+      opacity: 0.9;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-btn {
+      background: white;
+      color: var(--primary);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      color: var(--gray-600);
+      font-size: 0.875rem;
+    }
+
+    .filters-card {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .filters-grid {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 0.25rem;
+    }
+
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      background: white;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: var(--gray-50);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.875rem;
+    }
+
+    tr:hover {
+      background: var(--gray-50);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-pendiente { background: var(--warning-light); color: var(--warning); }
+    .status-aprobado { background: var(--success-light); color: var(--success); }
+    .status-recibido { background: var(--info-light); color: var(--info); }
+    .status-cancelado { background: var(--danger-light); color: var(--danger); }
+    .status-entregado { background: var(--success-light); color: var(--success); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    .btn-success:hover { background: #0b9e6e; }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+    .btn-warning:hover { background: #d97706; }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--radius);
+      max-width: 800px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-500);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--gray-700);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+    }
+
+    .insumo-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--gray-50);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .insumo-item select {
+      flex: 2;
+      min-width: 150px;
+    }
+
+    .insumo-item input {
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .insumo-item button {
+      padding: 0.3rem 0.75rem;
+    }
+
+    .info-encargada {
+      background: var(--primary-light);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .total-pedido {
+      background: var(--gray-100);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      text-align: right;
+      font-weight: bold;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fa-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .filters-grid { flex-direction: column; }
+      .filter-group { width: 100%; }
+      .insumo-item { flex-direction: column; }
+      .insumo-item input, .insumo-item select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1><i class="fas fa-shopping-cart"></i> Gestión de Pedidos</h1>
+    <p>Encargada de Insumos · Solicite y gestione pedidos de insumos</p>
+  </div>
+
+  <div class="info-encargada" id="infoEncargada">
+    <div><i class="fas fa-user-circle"></i> <strong>Encargada:</strong> <span id="encargadaNombre">Cargando...</span></div>
+    <div><i class="fas fa-id-card"></i> <strong>ID:</strong> <span id="encargadaId">-</span></div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn active" onclick="mostrarVista('pedidos')">
+      <i class="fas fa-list"></i> Mis Pedidos
+    </button>
+    <button class="nav-btn" onclick="mostrarVista('nuevo')">
+      <i class="fas fa-plus"></i> Nuevo Pedido
+    </button>
+  </div>
+
+  <!-- Vista de Pedidos -->
+  <div id="vistaPedidos">
+    <div class="stats-grid">
+      <div class="stat-card" onclick="filtrarPorEstado('PENDIENTE')">
+        <div class="number" id="countPendientes">0</div>
+        <div class="label">Pedidos Pendientes</div>
+      </div>
+      <div class="stat-card" onclick="filtrarPorEstado('APROBADO')">
+        <div class="number" id="countAprobados">0</div>
+        <div class="label">Pedidos Aprobados</div>
+      </div>
+      <div class="stat-card" onclick="filtrarPorEstado('RECIBIDO')">
+        <div class="number" id="countRecibidos">0</div>
+        <div class="label">Pedidos Recibidos</div>
+      </div>
+    </div>
+
+    <div class="filters-card">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label><i class="fas fa-filter"></i> Estado</label>
+          <select id="filterStatusPedido">
+            <option value="todos">Todos</option>
+            <option value="PENDIENTE">Pendientes</option>
+            <option value="APROBADO">Aprobados</option>
+            <option value="RECIBIDO">Recibidos</option>
+            <option value="CANCELADO">Cancelados</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label><i class="fas fa-calendar"></i> Desde</label>
+          <input type="date" id="filterFechaDesde">
+        </div>
+        <div class="filter-group">
+          <label><i class="fas fa-calendar"></i> Hasta</label>
+          <input type="date" id="filterFechaHasta">
+        </div>
+        <div class="filter-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="btnRefreshPedidos"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID Pedido</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Cant. Insumos</th>
+            <th>Total Unidades</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="pedidosTableBody">
+          <tr><td colspan="6" style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Cargando pedidos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Vista de Nuevo Pedido -->
+  <div id="vistaNuevo" style="display: none;">
+    <div class="filters-card">
+      <h3 style="margin-bottom: 1rem;"><i class="fas fa-plus-circle"></i> Crear Nuevo Pedido</h3>
+      <div class="form-group">
+        <label><i class="fas fa-box"></i> Agregar Insumo</label>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <select id="insumoSelect" style="flex: 2; min-width: 200px;">
+            <option value="">-- Seleccione un insumo --</option>
+          </select>
+          <select id="unidadMedidaSelect" style="flex: 1; min-width: 120px;">
+            <option value="">-- Unidad --</option>
+          </select>
+          <input type="number" id="cantidadPedido" placeholder="Cantidad" min="1" style="flex: 1; min-width: 100px;">
+          <button class="btn btn-success" onclick="agregarInsumo()">
+            <i class="fas fa-plus"></i> Agregar
+          </button>
+        </div>
+      </div>
+      <div id="listaInsumosAgregados" style="margin-top: 1rem;"></div>
+      <div class="total-pedido" id="totalPedido">
+        Total: 0 unidades
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+        <button class="btn btn-outline" onclick="limpiarPedido()">
+          <i class="fas fa-trash"></i> Limpiar
+        </button>
+        <button class="btn btn-primary" onclick="enviarPedido()">
+          <i class="fas fa-paper-plane"></i> Enviar Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalle -->
+<div id="detalleModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-clipboard-list"></i> Detalle del Pedido</h3>
+      <button class="close-modal" onclick="closeDetalleModal()">&times;</button>
+    </div>
+    <div id="detalleModalBody"></div>
+    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;" id="accionesModal">
+    </div>
+  </div>
+</div>
+
+<script>
+let idEncargadoInsumo = null;
+let pedidos = [];
+let insumosDisponibles = [];
+let unidadesMedida = [];
+let insumosPedido = [];
+let vistaActual = 'pedidos';
+
+async function obtenerIdEncargadoInsumo() {
+    let encargadoId = sessionStorage.getItem('idEncargadoInsumo');
+    let encargadoNombre = sessionStorage.getItem('nombreUsuario');
+    
+    if (encargadoId) {
+        document.getElementById('encargadaId').textContent = encargadoId;
+        document.getElementById('encargadaNombre').textContent = encargadoNombre || 'Encargado de Insumos';
+        return parseInt(encargadoId);
+    }
+    
+    Swal.fire({
+        title: 'Sesión no encontrada',
+        text: 'Debe iniciar sesión como encargado de insumos',
+        icon: 'error',
+        confirmButtonText: 'Ir al login'
+    }).then(() => {
+        window.location.href = '/';
+    });
+    return null;
+}
+
+async function cargarInsumos() {
+    try {
+        const response = await fetch('/api/pedidos/insumos');
+        if (!response.ok) throw new Error('Error al cargar insumos');
+        insumosDisponibles = await response.json();
+        
+        const select = document.getElementById('insumoSelect');
+        select.innerHTML = '<option value="">-- Seleccione un insumo --</option>' +
+            insumosDisponibles.map(i => `<option value="${i.idInsumo}">${i.nombreInsumo} - Stock: ${i.stockTotal}</option>`).join('');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function cargarUnidadesMedida() {
+    try {
+        const response = await fetch('/api/unidades-medida');
+        if (!response.ok) throw new Error('Error al cargar unidades de medida');
+        unidadesMedida = await response.json();
+        
+        const select = document.getElementById('unidadMedidaSelect');
+        select.innerHTML = '<option value="">-- Seleccione unidad --</option>' +
+            unidadesMedida.map(u => `<option value="${u.idUnidadMedida}">${u.nombreUnidad}</option>`).join('');
+    } catch (error) {
+        console.error('Error al cargar unidades de medida:', error);
+
+        const select = document.getElementById('unidadMedidaSelect');
+        select.innerHTML = '<option value="">-- Seleccione unidad --</option>' +
+            unidadesMedida.map(u => `<option value="${u.idUnidadMedida}">${u.nombreUnidad}</option>`).join('');
+    }
+}
+
+async function cargarPedidos() {
+    if (!idEncargadoInsumo) return;
+    
+    const tbody = document.getElementById('pedidosTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+    
+    try {
+        const response = await fetch(`/api/pedidos/encargado/${idEncargadoInsumo}`);
+        if (!response.ok) throw new Error('Error al cargar pedidos');
+        pedidos = await response.json();
+        aplicarFiltrosPedidos();
+    } catch (error) {
+        console.error('Error:', error);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar pedidos</td></tr>';
+    }
+}
+
+function aplicarFiltrosPedidos() {
+    const estadoFilter = document.getElementById('filterStatusPedido').value;
+    const fechaDesde = document.getElementById('filterFechaDesde').value;
+    const fechaHasta = document.getElementById('filterFechaHasta').value;
+    
+    let filtered = [...pedidos];
+    
+    if (estadoFilter !== 'todos') {
+        filtered = filtered.filter(p => p.estadoPedido === estadoFilter);
+    }
+    
+    if (fechaDesde) {
+        filtered = filtered.filter(p => p.fechaPedido >= fechaDesde);
+    }
+    
+    if (fechaHasta) {
+        filtered = filtered.filter(p => p.fechaPedido <= fechaHasta);
+    }
+    
+    actualizarTablaPedidos(filtered);
+    actualizarEstadisticas();
+}
+
+function actualizarTablaPedidos(pedidosFiltrados) {
+    const tbody = document.getElementById('pedidosTableBody');
+    
+    if (pedidosFiltrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay pedidos</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = pedidosFiltrados.map(p => `
+        <tr>
+            <td><strong>#${p.idPedido}</strong></td>
+            <td>${formatDate(p.fechaPedido)}</td>
+            <td>${getStatusBadge(p.estadoPedido)}</td>
+            <td>${p.cantidadInsumos || 0}</td>
+            <td>${p.totalUnidades || 0}</td>
+            <td>
+                <button class="btn btn-outline" onclick="verDetallePedido(${p.idPedido})" style="padding: 0.3rem 0.75rem;">
+                    <i class="fas fa-eye"></i> Ver
+                </button>
+                ${p.estadoPedido === 'APROBADO' ? `
+                    <button class="btn btn-success" onclick="recibirPedido(${p.idPedido})" style="padding: 0.3rem 0.75rem; margin-left: 0.5rem;">
+                        <i class="fas fa-check"></i> Recibir
+                    </button>
+                ` : ''}
+                ${p.estadoPedido === 'PENDIENTE' ? `
+                    <button class="btn btn-danger" onclick="cancelarPedido(${p.idPedido})" style="padding: 0.3rem 0.75rem; margin-left: 0.5rem;">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function actualizarEstadisticas() {
+    const pendientes = pedidos.filter(p => p.estadoPedido === 'PENDIENTE').length;
+    const aprobados = pedidos.filter(p => p.estadoPedido === 'APROBADO').length;
+    const recibidos = pedidos.filter(p => p.estadoPedido === 'RECIBIDO').length;
+    
+    document.getElementById('countPendientes').textContent = pendientes;
+    document.getElementById('countAprobados').textContent = aprobados;
+    document.getElementById('countRecibidos').textContent = recibidos;
+}
+
+function filtrarPorEstado(estado) {
+    document.getElementById('filterStatusPedido').value = estado;
+    aplicarFiltrosPedidos();
+}
+
+async function verDetallePedido(idPedido) {
+    try {
+        const response = await fetch(`/api/pedidos/${idPedido}/detalle`);
+        if (!response.ok) throw new Error('Error');
+        const detalle = await response.json();
+        
+        let insumosHtml = '';
+        let totalUnidades = 0;
+        
+        if (detalle.insumos && detalle.insumos.length > 0) {
+            insumosHtml = '<table style="width: 100%; border-collapse: collapse;">' +
+                '<tr style="background: var(--gray-100);"><th style="padding: 0.5rem;">Insumo</th><th>Cantidad</th><th>Unidad</th><th>Estado</th></tr>';
+            
+            insumosHtml += detalle.insumos.map(i => {
+                totalUnidades += i.cantidadPedida;
+                return `
+                    <tr>
+                        <td style="padding: 0.5rem;">${i.nombreInsumo}</td>
+                        <td style="padding: 0.5rem; text-align: center;">${i.cantidadPedida}</td>
+                        <td style="padding: 0.5rem;">${i.nombreUnidad || i.unidadMedida || 'unidades'}</td>
+                        <td style="padding: 0.5rem;">${getStatusBadge(i.estadoDetPedido)}</td>
+                    </tr>
+                `;
+            }).join('');
+            insumosHtml += '</table>';
+        } else {
+            insumosHtml = '<p>No hay insumos en este pedido</p>';
+        }
+        
+        document.getElementById('detalleModalBody').innerHTML = `
+            <div style="margin-bottom: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px;">
+                <p><strong>📋 Pedido #${detalle.idPedido}</strong></p>
+                <p><strong>📅 Fecha:</strong> ${formatDate(detalle.fechaPedido)}</p>
+                <p><strong>📊 Estado:</strong> ${getStatusBadge(detalle.estadoPedido)}</p>
+                <p><strong>👤 Encargado:</strong> ${detalle.encargadoNombre || 'N/A'}</p>
+                <p><strong>📦 Total unidades:</strong> ${totalUnidades}</p>
+            </div>
+            <h4>Insumos solicitados:</h4>
+            ${insumosHtml}
+        `;
+        
+        const accionesDiv = document.getElementById('accionesModal');
+        accionesDiv.innerHTML = '';
+        
+        if (detalle.estadoPedido === 'APROBADO') {
+            accionesDiv.innerHTML = `
+                <button class="btn btn-outline" onclick="closeDetalleModal()">Cerrar</button>
+                <button class="btn btn-success" onclick="recibirPedido(${idPedido})">
+                    <i class="fas fa-check"></i> Recibir Pedido
+                </button>
+            `;
+        } else if (detalle.estadoPedido === 'PENDIENTE') {
+            accionesDiv.innerHTML = `
+                <button class="btn btn-outline" onclick="closeDetalleModal()">Cerrar</button>
+                <button class="btn btn-danger" onclick="cancelarPedido(${idPedido})">
+                    <i class="fas fa-times"></i> Cancelar Pedido
+                </button>
+            `;
+        } else {
+            accionesDiv.innerHTML = `<button class="btn btn-outline" onclick="closeDetalleModal()">Cerrar</button>`;
+        }
+        
+        document.getElementById('detalleModal').classList.add('active');
+        
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo cargar el detalle', 'error');
+    }
+}
+
+async function recibirPedido(idPedido) {
+    const result = await Swal.fire({
+        title: '¿Recibir pedido?',
+        text: 'Al recibir el pedido, el stock se actualizará automáticamente',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        confirmButtonText: 'Sí, recibir',
+        cancelButtonText: 'Cancelar'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    try {
+        const response = await fetch(`/api/pedidos/${idPedido}/recibir`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idEncargado: idEncargadoInsumo })
+        });
+        
+        if (!response.ok) throw new Error('Error al recibir pedido');
+        
+        Swal.fire('¡Recibido!', 'El pedido ha sido recibido y el stock ha sido actualizado', 'success');
+        closeDetalleModal();
+        cargarPedidos();
+        if (vistaActual === 'nuevo') cargarInsumos();
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo recibir el pedido', 'error');
+    }
+}
+
+async function cancelarPedido(idPedido) {
+    const result = await Swal.fire({
+        title: '¿Cancelar pedido?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'No'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    try {
+        const response = await fetch(`/api/pedidos/${idPedido}/cancelar`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idEncargado: idEncargadoInsumo })
+        });
+        
+        if (!response.ok) throw new Error('Error al cancelar pedido');
+        
+        Swal.fire('Cancelado', 'El pedido ha sido cancelado', 'success');
+        closeDetalleModal();
+        cargarPedidos();
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo cancelar el pedido', 'error');
+    }
+}
+
+function agregarInsumo() {
+    const idInsumo = document.getElementById('insumoSelect').value;
+    const idUnidadMedida = document.getElementById('unidadMedidaSelect').value;
+    const cantidad = parseInt(document.getElementById('cantidadPedido').value);
+    
+    if (!idInsumo) {
+        Swal.fire('Error', 'Seleccione un insumo', 'error');
+        return;
+    }
+    
+    if (!idUnidadMedida) {
+        Swal.fire('Error', 'Seleccione una unidad de medida', 'error');
+        return;
+    }
+    
+    if (!cantidad || cantidad <= 0) {
+        Swal.fire('Error', 'Ingrese una cantidad válida', 'error');
+        return;
+    }
+    
+    const insumo = insumosDisponibles.find(i => i.idInsumo == idInsumo);
+    if (!insumo) return;
+    
+    const unidad = unidadesMedida.find(u => u.idUnidadMedida == idUnidadMedida);
+    if (!unidad) return;
+    
+    const existe = insumosPedido.find(i => i.idInsumo == idInsumo);
+    if (existe) {
+        Swal.fire('Error', 'Este insumo ya fue agregado', 'error');
+        return;
+    }
+    
+    insumosPedido.push({
+        idInsumo: parseInt(idInsumo),
+        nombreInsumo: insumo.nombreInsumo,
+        idUnidadMedida: parseInt(idUnidadMedida),
+        nombreUnidad: unidad.nombreUnidad,
+        cantidadPedida: cantidad
+    });
+    
+    actualizarListaInsumos();
+    document.getElementById('insumoSelect').value = '';
+    document.getElementById('unidadMedidaSelect').value = '';
+    document.getElementById('cantidadPedido').value = '';
+}
+
+function actualizarListaInsumos() {
+    const container = document.getElementById('listaInsumosAgregados');
+    const totalUnidades = insumosPedido.reduce((sum, i) => sum + i.cantidadPedida, 0);
+    
+    if (insumosPedido.length === 0) {
+        container.innerHTML = '<p style="color: var(--gray-500); text-align: center;">No hay insumos agregados</p>';
+        document.getElementById('totalPedido').innerHTML = `Total: 0 unidades`;
+        return;
+    }
+    
+    container.innerHTML = insumosPedido.map((insumo, index) => `
+        <div class="insumo-item">
+            <span style="flex: 2;"><strong>${insumo.nombreInsumo}</strong></span>
+            <span style="flex: 1;">${insumo.cantidadPedida} ${insumo.nombreUnidad}</span>
+            <button class="btn btn-danger" onclick="eliminarInsumo(${index})" style="padding: 0.3rem 0.75rem;">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    document.getElementById('totalPedido').innerHTML = `Total: ${totalUnidades} unidades (${insumosPedido.length} tipos de insumos)`;
+}
+
+function eliminarInsumo(index) {
+    insumosPedido.splice(index, 1);
+    actualizarListaInsumos();
+}
+
+function limpiarPedido() {
+    insumosPedido = [];
+    actualizarListaInsumos();
+}
+
+async function enviarPedido() {
+    if (insumosPedido.length === 0) {
+        Swal.fire('Error', 'Agregue al menos un insumo al pedido', 'error');
+        return;
+    }
+    
+    const payload = {
+        idEncargado: idEncargadoInsumo,
+        insumos: insumosPedido.map(item => ({
+            idInsumo: item.idInsumo,
+            idUnidadMedida: item.idUnidadMedida,
+            cantidadPedida: item.cantidadPedida
+        }))
+    };
+    
+    const result = await Swal.fire({
+        title: 'Confirmar pedido',
+        html: `<p>¿Está seguro de realizar este pedido?</p>
+               <p><strong>Total:</strong> ${insumosPedido.reduce((sum, i) => sum + i.cantidadPedida, 0)} unidades</p>
+               <p><strong>Tipos de insumos:</strong> ${insumosPedido.length}</p>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#006D77',
+        confirmButtonText: 'Sí, enviar pedido',
+        cancelButtonText: 'Cancelar'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    try {
+        const response = await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const responseData = await response.json();
+        
+        if (!response.ok) throw new Error(responseData.error || 'Error al crear pedido');
+        
+        Swal.fire('¡Pedido creado!', 'El pedido ha sido enviado correctamente', 'success');
+        limpiarPedido();
+        mostrarVista('pedidos');
+        cargarPedidos();
+    } catch (error) {
+        console.error('Error completo:', error);
+        Swal.fire('Error', error.message || 'No se pudo crear el pedido', 'error');
+    }
+}
+
+function mostrarVista(vista) {
+    vistaActual = vista;
+    const vistaPedidos = document.getElementById('vistaPedidos');
+    const vistaNuevo = document.getElementById('vistaNuevo');
+    const botones = document.querySelectorAll('.nav-btn');
+    
+    if (vista === 'pedidos') {
+        vistaPedidos.style.display = 'block';
+        vistaNuevo.style.display = 'none';
+        botones[0].classList.add('active');
+        botones[1].classList.remove('active');
+        cargarPedidos();
+    } else {
+        vistaPedidos.style.display = 'none';
+        vistaNuevo.style.display = 'block';
+        botones[0].classList.remove('active');
+        botones[1].classList.add('active');
+        cargarInsumos();
+        cargarUnidadesMedida();
+    }
+}
+
+function closeDetalleModal() {
+    document.getElementById('detalleModal').classList.remove('active');
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES');
+}
+
+function getStatusBadge(status) {
+    const statusMap = {
+        'PENDIENTE': { class: 'status-pendiente', icon: 'fa-hourglass-half', text: 'Pendiente' },
+        'APROBADO': { class: 'status-aprobado', icon: 'fa-check-circle', text: 'Aprobado' },
+        'RECIBIDO': { class: 'status-recibido', icon: 'fa-box-open', text: 'Recibido' },
+        'CANCELADO': { class: 'status-cancelado', icon: 'fa-times-circle', text: 'Cancelado' },
+        'ENTREGADO_COMPLETO': { class: 'status-entregado', icon: 'fa-check-double', text: 'Completado' }
+    };
+    const s = statusMap[status] || { class: 'status-pendiente', icon: 'fa-question-circle', text: status };
+    return `<span class="status-badge ${s.class}"><i class="fas ${s.icon}"></i> ${s.text}</span>`;
+}
+
+// Event listeners
+document.getElementById('btnRefreshPedidos').addEventListener('click', () => cargarPedidos());
+document.getElementById('filterStatusPedido').addEventListener('change', () => aplicarFiltrosPedidos());
+document.getElementById('filterFechaDesde').addEventListener('change', () => aplicarFiltrosPedidos());
+document.getElementById('filterFechaHasta').addEventListener('change', () => aplicarFiltrosPedidos());
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetalleModal(); });
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', async () => {
+    idEncargadoInsumo = await obtenerIdEncargadoInsumo();
+    if (idEncargadoInsumo) {
+        await cargarPedidos();
+        await cargarInsumos();
+        await cargarUnidadesMedida();
+    }
+});
+</script>
+</body>
+</html>

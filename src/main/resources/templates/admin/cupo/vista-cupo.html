@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cupos - Clínica Odontológica</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .cupo-card:hover { transform: translateY(-2px); transition: all 0.2s ease; }
+        .editing { background-color: #fef9c3; }
+        .modal-transition { transition: opacity 0.2s ease; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans">
+
+<div class="max-w-6xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+            <i class="fas fa-ticket-alt text-indigo-500"></i> Gestión de Cupos
+        </h1>
+        <p class="text-gray-500 mt-1">Administra cupos por materia y tratamiento</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-6 md:p-8">
+            <!-- Barra de acciones con botón Crear Cupo -->
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <div class="flex gap-2">
+                    <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                    <button id="addCupoBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Crear Cupo
+                    </button>
+                    <button id="addMateriaBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Añadir Materia
+                    </button>
+                    <button id="addTratamientoBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Añadir Tratamiento
+                    </button>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-edit"></i> Edita cupos haciendo clic en "Editar"
+                </div>
+            </div>
+
+            <!-- Tabla de cupos -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-xl">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Materia</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tratamiento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cupos disponibles</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                        </tr></thead>
+                    <tbody id="cuposTableBody">
+                        <tr><td colspan="4" class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-spin"></i> Cargando cupos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="resultMessage" class="mt-6 hidden p-3 rounded-lg text-center font-medium"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR CUPO -->
+<div id="cupoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal-transition">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div class="flex justify-between items-center border-b px-6 py-4">
+            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-ticket-alt text-indigo-500 mr-2"></i>Nuevo Cupo</h3>
+            <button class="closeModalBtn text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Materia *</label>
+                <select id="cupoMateriaSelect" class="w-full border rounded-lg px-3 py-2">
+                    <option value="">-- Cargando materias --</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Tratamiento *</label>
+                <select id="cupoTratamientoSelect" class="w-full border rounded-lg px-3 py-2">
+                    <option value="">-- Cargando tratamientos --</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Cupos disponibles *</label>
+                <input type="number" id="cupoCantidad" min="0" value="0" class="w-full border rounded-lg px-3 py-2">
+            </div>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
+            <button class="cancelModalBtn px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+            <button id="saveCupoBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL AÑADIR MATERIA (con select de clínicas que muestra el turno) -->
+<div id="materiaModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal-transition">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div class="flex justify-between items-center border-b px-6 py-4">
+            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-book-open text-green-500 mr-2"></i>Nueva Materia</h3>
+            <button class="closeModalBtn text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div><label class="block text-gray-700 font-medium mb-1">Nombre *</label><input type="text" id="materiaNombre" class="w-full border rounded-lg px-3 py-2"></div>
+            <div><label class="block text-gray-700 font-medium mb-1">Código *</label><input type="text" id="materiaCodigo" class="w-full border rounded-lg px-3 py-2"></div>
+            <div><label class="block text-gray-700 font-medium mb-1">Clínica *</label>
+                <select id="materiaClinicaSelect" class="w-full border rounded-lg px-3 py-2">
+                    <option value="">-- Seleccione clínica --</option>
+                </select>
+            </div>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
+            <button class="cancelModalBtn px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+            <button id="saveMateriaBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL AÑADIR TRATAMIENTO -->
+<div id="tratamientoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal-transition">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div class="flex justify-between items-center border-b px-6 py-4">
+            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-tooth text-purple-500 mr-2"></i>Nuevo Tratamiento</h3>
+            <button class="closeModalBtn text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div><label class="block text-gray-700 font-medium mb-1">Nombre *</label><input type="text" id="tratamientoNombre" class="w-full border rounded-lg px-3 py-2"></div>
+            <div><label class="block text-gray-700 font-medium mb-1">Precio *</label><input type="number" step="0.01" id="tratamientoPrecio" class="w-full border rounded-lg px-3 py-2"></div>
+            <div><label class="block text-gray-700 font-medium mb-1">ID Tipo Tratamiento *</label><input type="number" id="tratamientoTipoId" class="w-full border rounded-lg px-3 py-2"></div>
+            <div><label class="block text-gray-700 font-medium mb-1">Descripción</label><textarea id="tratamientoDescripcion" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea></div>
+        </div>
+        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
+            <button class="cancelModalBtn px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+            <button id="saveTratamientoBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = ''; // Si tu backend corre en otro puerto, ej: 'http://localhost:8080'
+    let cuposData = [];
+
+    // ==================== CUPOS ====================
+    async function cargarCupos() {
+        const tbody = document.getElementById('cuposTableBody');
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8"><i class="fas fa-spinner fa-spin"></i> Cargando cupos...</td></tr>';
+        try {
+            const res = await fetch(`${API_BASE}/api/cupos`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            cuposData = await res.json();
+            renderizarTabla();
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-red-500">Error: ${error.message}</td></tr>`;
+        }
+    }
+
+    function renderizarTabla() {
+        const tbody = document.getElementById('cuposTableBody');
+        if (!cuposData.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-500">No hay cupos registrados. Crea uno nuevo.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        cuposData.forEach(cupo => {
+            const row = document.createElement('tr');
+            row.className = 'border-b hover:bg-gray-50 transition cupo-card';
+            row.setAttribute('data-id', cupo.idCupos);
+            const materiaNombre = cupo.materia?.nombreMateria || `ID: ${cupo.materia?.id_materia}`;
+            const tratamientoNombre = cupo.tratamiento?.nombreTratamiento || `ID: ${cupo.tratamiento?.idTratamiento}`;
+            row.innerHTML = `
+                <td class="px-6 py-4 text-sm text-gray-800">${materiaNombre}</td>
+                <td class="px-6 py-4 text-sm text-gray-800">${tratamientoNombre}</td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="cupo-valor-display">${cupo.cuposDisponibles}</span>
+                    <input type="number" class="cupo-editor hidden w-24 px-2 py-1 border rounded" value="${cupo.cuposDisponibles}" min="0">
+                </td>
+                <td class="px-6 py-4 text-sm">
+                    <button class="btn-editar bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs"><i class="fas fa-edit"></i> Editar</button>
+                    <button class="btn-guardar hidden bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs ml-2"><i class="fas fa-save"></i> Guardar</button>
+                    <button class="btn-cancelar hidden bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded-lg text-xs ml-2"><i class="fas fa-times"></i> Cancelar</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+
+            const displaySpan = row.querySelector('.cupo-valor-display');
+            const editorInput = row.querySelector('.cupo-editor');
+            const btnEditar = row.querySelector('.btn-editar');
+            const btnGuardar = row.querySelector('.btn-guardar');
+            const btnCancelar = row.querySelector('.btn-cancelar');
+
+            btnEditar.addEventListener('click', () => {
+                displaySpan.classList.add('hidden');
+                editorInput.classList.remove('hidden');
+                btnEditar.classList.add('hidden');
+                btnGuardar.classList.remove('hidden');
+                btnCancelar.classList.remove('hidden');
+                row.classList.add('editing');
+                editorInput.focus();
+            });
+            btnCancelar.addEventListener('click', () => {
+                displaySpan.classList.remove('hidden');
+                editorInput.classList.add('hidden');
+                btnEditar.classList.remove('hidden');
+                btnGuardar.classList.add('hidden');
+                btnCancelar.classList.add('hidden');
+                row.classList.remove('editing');
+                editorInput.value = cupo.cuposDisponibles;
+                displaySpan.textContent = cupo.cuposDisponibles;
+            });
+            btnGuardar.addEventListener('click', async () => {
+                const nuevoValor = parseInt(editorInput.value, 10);
+                if (isNaN(nuevoValor) || nuevoValor < 0) {
+                    mostrarMensaje('El cupo debe ser ≥ 0', 'error');
+                    return;
+                }
+                const valorAnterior = cupo.cuposDisponibles;
+                cupo.cuposDisponibles = nuevoValor;
+                displaySpan.textContent = nuevoValor;
+                displaySpan.classList.remove('hidden');
+                editorInput.classList.add('hidden');
+                btnEditar.classList.remove('hidden');
+                btnGuardar.classList.add('hidden');
+                btnCancelar.classList.add('hidden');
+                row.classList.remove('editing');
+                try {
+                    const res = await fetch(`${API_BASE}/api/cupos/${cupo.idCupos}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cuposDisponibles: nuevoValor })
+                    });
+                    if (!res.ok) throw new Error((await res.json()).message || 'Error');
+                    mostrarMensaje(`Cupos actualizados: ${materiaNombre} / ${tratamientoNombre}`, 'success');
+                } catch (error) {
+                    cupo.cuposDisponibles = valorAnterior;
+                    displaySpan.textContent = valorAnterior;
+                    editorInput.value = valorAnterior;
+                    mostrarMensaje(`Error: ${error.message}`, 'error');
+                }
+            });
+        });
+    }
+
+    // ==================== CARGAR LISTAS ====================
+    async function cargarMaterias(selectId) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">-- Cargando materias --</option>';
+        try {
+            const res = await fetch(`${API_BASE}/api/materias`);
+            if (!res.ok) throw new Error();
+            const materias = await res.json();
+            select.innerHTML = '<option value="">-- Seleccione materia --</option>';
+            materias.forEach(mat => {
+                const option = document.createElement('option');
+                option.value = mat.id_materia;
+                option.textContent = `${mat.nombreMateria} (${mat.codigoMateria})`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error cargando materias', error);
+            select.innerHTML = '<option value="">Error al cargar materias</option>';
+        }
+    }
+
+    async function cargarTratamientos(selectId) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">-- Cargando tratamientos --</option>';
+        try {
+            const res = await fetch(`${API_BASE}/api/tratamientos`);
+            if (!res.ok) throw new Error();
+            const tratamientos = await res.json();
+            select.innerHTML = '<option value="">-- Seleccione tratamiento --</option>';
+            tratamientos.forEach(tr => {
+                const option = document.createElement('option');
+                option.value = tr.idTratamiento;
+                option.textContent = `${tr.nombreTratamiento} - ${tr.tipoTratamiento?.nombreTipo || 'Sin tipo'}`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error cargando tratamientos', error);
+            select.innerHTML = '<option value="">Error al cargar tratamientos</option>';
+        }
+    }
+
+    // Función corregida para mostrar el turno de la clínica
+    async function cargarClinicas() {
+        const select = document.getElementById('materiaClinicaSelect');
+        select.innerHTML = '<option value="">-- Cargando clínicas --</option>';
+        try {
+            const res = await fetch(`${API_BASE}/api/clinicas`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const clinicas = await res.json();
+            select.innerHTML = '<option value="">-- Seleccione clínica --</option>';
+            clinicas.forEach(clin => {
+                const option = document.createElement('option');
+                option.value = clin.idClinica;
+                // Mostrar nombre y turno (si existe)
+                const textoOpcion = clin.turno ? `${clin.nombreClinica} (${clin.turno})` : clin.nombreClinica;
+                option.textContent = textoOpcion;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error cargando clínicas:', error);
+            select.innerHTML = '<option value="">Error al cargar clínicas. Verifica el endpoint.</option>';
+        }
+    }
+
+    // ==================== CREAR CUPO ====================
+    async function crearCupo(materiaId, tratamientoId, cupos) {
+        const nuevoCupo = {
+            materia: { id_materia: parseInt(materiaId) },
+            tratamiento: { idTratamiento: parseInt(tratamientoId) },
+            cuposDisponibles: parseInt(cupos)
+        };
+        const res = await fetch(`${API_BASE}/api/cupos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoCupo)
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Error al crear cupo');
+        }
+        return await res.json();
+    }
+
+    // ==================== MODALES ====================
+    function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    document.querySelectorAll('.closeModalBtn, .cancelModalBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modal = btn.closest('.fixed');
+            if (modal) cerrarModal(modal.id);
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('fixed')) cerrarModal(e.target.id);
+    });
+
+    // Botón Crear Cupo
+    document.getElementById('addCupoBtn').addEventListener('click', async () => {
+        await cargarMaterias('cupoMateriaSelect');
+        await cargarTratamientos('cupoTratamientoSelect');
+        abrirModal('cupoModal');
+    });
+
+    document.getElementById('saveCupoBtn').addEventListener('click', async () => {
+        const materiaId = document.getElementById('cupoMateriaSelect').value;
+        const tratamientoId = document.getElementById('cupoTratamientoSelect').value;
+        const cantidad = document.getElementById('cupoCantidad').value;
+        if (!materiaId || !tratamientoId || cantidad === '') {
+            mostrarMensajeModal('cupoModal', 'Seleccione materia, tratamiento y cantidad', 'error');
+            return;
+        }
+        const btn = document.getElementById('saveCupoBtn');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+        try {
+            await crearCupo(materiaId, tratamientoId, cantidad);
+            mostrarMensajeModal('cupoModal', 'Cupo creado correctamente', 'success');
+            setTimeout(() => cerrarModal('cupoModal'), 1500);
+            cargarCupos();
+            document.getElementById('cupoMateriaSelect').value = '';
+            document.getElementById('cupoTratamientoSelect').value = '';
+            document.getElementById('cupoCantidad').value = '0';
+        } catch (error) {
+            mostrarMensajeModal('cupoModal', error.message, 'error');
+        } finally {
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
+    });
+
+    // Botón Añadir Materia
+    document.getElementById('addMateriaBtn').addEventListener('click', () => {
+        cargarClinicas(); // ahora carga correctamente con turno
+        abrirModal('materiaModal');
+    });
+    document.getElementById('saveMateriaBtn').addEventListener('click', async () => {
+        const nombre = document.getElementById('materiaNombre').value.trim();
+        const codigo = document.getElementById('materiaCodigo').value.trim();
+        const clinicaId = document.getElementById('materiaClinicaSelect').value;
+
+
+        if (!nombre || !codigo || !clinicaId) {
+            mostrarMensajeModal('materiaModal', 'Complete todos los campos', 'error');
+            return;
+        }
+        const nuevaMateria = {
+            nombreMateria: nombre,
+            codigoMateria: codigo,
+            clinica: { idClinica: parseInt(clinicaId) }
+        };
+        const btn = document.getElementById('saveMateriaBtn');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${API_BASE}/api/materias`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevaMateria)
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Error');
+            mostrarMensajeModal('materiaModal', 'Materia creada', 'success');
+            setTimeout(() => cerrarModal('materiaModal'), 1500);
+            document.getElementById('materiaNombre').value = '';
+            document.getElementById('materiaCodigo').value = '';
+            cargarCupos();
+        } catch (error) {
+            mostrarMensajeModal('materiaModal', error.message, 'error');
+        } finally {
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
+    });
+
+    // Botón Añadir Tratamiento
+    document.getElementById('addTratamientoBtn').addEventListener('click', () => abrirModal('tratamientoModal'));
+    document.getElementById('saveTratamientoBtn').addEventListener('click', async () => {
+        const nombre = document.getElementById('tratamientoNombre').value.trim();
+        const precio = parseFloat(document.getElementById('tratamientoPrecio').value);
+        const tipoId = parseInt(document.getElementById('tratamientoTipoId').value);
+        const descripcion = document.getElementById('tratamientoDescripcion').value.trim();
+        if (!nombre || isNaN(precio) || isNaN(tipoId)) {
+            mostrarMensajeModal('tratamientoModal', 'Complete nombre, precio y tipo', 'error');
+            return;
+        }
+        const nuevoTratamiento = {
+            nombreTratamiento: nombre,
+            precioTratamiento: precio,
+            tipoTratamiento: { idTipoTratamiento: tipoId },
+            descripcionTratamiento: descripcion || null
+        };
+        const btn = document.getElementById('saveTratamientoBtn');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${API_BASE}/api/tratamientos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevoTratamiento)
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Error');
+            mostrarMensajeModal('tratamientoModal', 'Tratamiento creado', 'success');
+            setTimeout(() => cerrarModal('tratamientoModal'), 1500);
+            document.getElementById('tratamientoNombre').value = '';
+            document.getElementById('tratamientoPrecio').value = '';
+            document.getElementById('tratamientoTipoId').value = '';
+            document.getElementById('tratamientoDescripcion').value = '';
+            cargarCupos();
+        } catch (error) {
+            mostrarMensajeModal('tratamientoModal', error.message, 'error');
+        } finally {
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
+    });
+
+    // ==================== MENSAJES ====================
+    function mostrarMensajeModal(modalId, msg, tipo) {
+        const modal = document.getElementById(modalId);
+        let msgDiv = modal.querySelector('.modal-message');
+        if (!msgDiv) {
+            msgDiv = document.createElement('div');
+            msgDiv.className = 'modal-message mt-3 p-2 rounded text-sm text-center';
+            modal.querySelector('.p-6').appendChild(msgDiv);
+        }
+        msgDiv.className = `modal-message mt-3 p-2 rounded text-sm text-center ${tipo === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+        msgDiv.innerHTML = tipo === 'error' ? `<i class="fas fa-exclamation-circle"></i> ${msg}` : `<i class="fas fa-check-circle"></i> ${msg}`;
+        setTimeout(() => msgDiv.remove(), 3000);
+    }
+
+    function mostrarMensaje(msg, tipo) {
+        const div = document.getElementById('resultMessage');
+        div.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+        div.classList.add(tipo === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700');
+        div.innerHTML = `<i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-2"></i> ${msg}`;
+        div.classList.remove('hidden');
+        setTimeout(() => div.classList.add('hidden'), 4000);
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        cargarCupos();
+        mostrarMensaje('Lista actualizada', 'success');
+    });
+
+    // Inicializar
+    cargarCupos();
+</script>
+</body>
+</html>

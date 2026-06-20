@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Odontológica - Tratamientos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary i {
+            margin-right: 8px;
+        }
+        
+        .btn-action {
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            margin: 0 3px;
+            transition: all 0.3s;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s;
+        }
+        
+        .table tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .badge-precio {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+        }
+        
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.8rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .invalid-feedback {
+            font-size: 0.875rem;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .search-box input {
+            padding-left: 45px;
+            border-radius: 30px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card i {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            color: #333;
+        }
+        
+        .stats-card p {
+            color: #666;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Estilos para el modal personalizado (como el de tipos) */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .custom-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .custom-modal .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .custom-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .custom-modal .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .custom-modal .modal-header .close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .custom-modal .modal-body {
+            padding: 20px;
+        }
+        
+        .custom-modal .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .alert.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .alert.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header con navegación -->
+        <div class="header-card fade-in">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>
+                        Gestión de Tratamientos
+                    </h1>
+                    <p class="text-muted">Administra todos los tratamientos de la clínica</p>
+                </div>
+                <div>
+                    <a href="/clinicas" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-building"></i> Clínicas
+                    </a>
+                    <a href="/tipos-tratamiento" class="btn btn-outline-primary">
+                        <i class="bi bi-tags"></i> Tipos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="content-card fade-in">
+            <!-- Barra de búsqueda y botón nuevo -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control" id="buscador" placeholder="Buscar tratamientos...">
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary" onclick="abrirModal()">
+                        <i class="bi bi-plus-circle"></i>
+                        Nuevo Tratamiento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de tratamientos -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="tablaTratamientos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Precio</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal personalizado para crear/editar (como el de tipos) -->
+    <div class="custom-modal" id="tratamientoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">
+                    <i class="bi bi-plus-circle"></i>
+                    Nuevo Tratamiento
+                </h3>
+                <button class="close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="tratamientoForm">
+                    <input type="hidden" id="idTratamiento">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Tratamiento</label>
+                        <input type="text" class="form-control" id="nombreTratamiento" required maxlength="100" placeholder="Ingrese el nombre del tratamiento">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Tratamiento</label>
+                        <select class="form-select" id="tipoTratamiento" required>
+                            <option value="">Seleccione un tipo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Precio (Bs)</label>
+                        <input type="number" class="form-control" id="precioTratamiento" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcionTratamiento" rows="3" maxlength="255" placeholder="Ingrese una descripción del tratamiento"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarTratamiento()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variable global para el modal
+        const modal = document.getElementById('tratamientoModal');
+        
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarTratamientos();
+            cargarTiposTratamiento();
+        });
+
+        // Función para cargar tratamientos
+        function cargarTratamientos() {
+            fetch('/api/tratamientos')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('tablaBody');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach(tratamiento => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${tratamiento.idTratamiento}</td>
+                            <td>${tratamiento.nombreTratamiento}</td>
+                            <td>
+                                <span class="badge bg-info">${tratamiento.tipoTratamiento?.nombreTipo || 'Sin tipo'}</span>
+                            </td>
+                            <td>
+                                <span class="badge-precio">${tratamiento.precioTratamiento ? tratamiento.precioTratamiento.toFixed(2) + 'Bs' : '0.00Bs'}</span>
+                            </td>
+                            <td>${tratamiento.descripcionTratamiento || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning btn-action" onclick="editarTratamiento(${tratamiento.idTratamiento})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger btn-action" onclick="eliminarTratamiento(${tratamiento.idTratamiento})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error al cargar los tratamientos', 'error');
+                });
+        }
+
+        // Función para cargar tipos de tratamiento en el select
+        function cargarTiposTratamiento() {
+            fetch('/api/tipos-tratamiento')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('tipoTratamiento');
+                    select.innerHTML = '<option value="">Seleccione un tipo</option>';
+                    
+                    data.forEach(tipo => {
+                        const option = document.createElement('option');
+                        option.value = tipo.idTipoTratamiento;
+                        option.textContent = tipo.nombreTipo;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Función para abrir modal (nuevo)
+        function abrirModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-circle"></i> Nuevo Tratamiento';
+            document.getElementById('tratamientoForm').reset();
+            document.getElementById('idTratamiento').value = '';
+            modal.classList.add('show');
+        }
+
+        // Función para cerrar modal
+        function cerrarModal() {
+            modal.classList.remove('show');
+            document.getElementById('tratamientoForm').reset();
+        }
+
+        // Función para editar tratamiento
+        function editarTratamiento(id) {
+            fetch(`/api/tratamientos/${id}`)
+                .then(response => response.json())
+                .then(tratamiento => {
+                    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil"></i> Editar Tratamiento';
+                    document.getElementById('idTratamiento').value = tratamiento.idTratamiento;
+                    document.getElementById('nombreTratamiento').value = tratamiento.nombreTratamiento;
+                    document.getElementById('tipoTratamiento').value = tratamiento.tipoTratamiento?.idTipoTratamiento || '';
+                    document.getElementById('precioTratamiento').value = tratamiento.precioTratamiento;
+                    document.getElementById('descripcionTratamiento').value = tratamiento.descripcionTratamiento || '';
+                    
+                    modal.classList.add('show');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error al cargar el tratamiento', 'error');
+                });
+        }
+
+        // Función para guardar tratamiento
+        function guardarTratamiento() {
+            const id = document.getElementById('idTratamiento').value;
+            const nombre = document.getElementById('nombreTratamiento').value;
+            const tipoId = document.getElementById('tipoTratamiento').value;
+            const precio = document.getElementById('precioTratamiento').value;
+            const descripcion = document.getElementById('descripcionTratamiento').value;
+
+            if (!nombre || !tipoId || !precio) {
+                mostrarAlerta('Por favor complete los campos requeridos', 'error');
+                return;
+            }
+
+            const tratamientoData = {
+                idTratamiento: id || null,
+                nombreTratamiento: nombre,
+                precioTratamiento: parseFloat(precio),
+                descripcionTratamiento: descripcion,
+                tipoTratamiento: { idTipoTratamiento: parseInt(tipoId) }
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/tratamientos/${id}` : '/api/tratamientos';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tratamientoData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    cerrarModal();
+                    cargarTratamientos();
+                    mostrarAlerta(id ? 'Tratamiento actualizado con éxito' : 'Tratamiento creado con éxito', 'success');
+                } else {
+                    throw new Error('Error al guardar');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('Error al guardar el tratamiento', 'error');
+            });
+        }
+
+        // Función para eliminar tratamiento
+        function eliminarTratamiento(id) {
+            if (confirm('¿Está seguro de eliminar este tratamiento?')) {
+                fetch(`/api/tratamientos/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        cargarTratamientos();
+                        mostrarAlerta('Tratamiento eliminado con éxito', 'success');
+                    } else {
+                        throw new Error('Error al eliminar');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error al eliminar el tratamiento', 'error');
+                });
+            }
+        }
+
+        // Función para buscar en la tabla
+        document.getElementById('buscador').addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.getElementById('tablaBody').getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            }
+        });
+
+        // Función para mostrar alertas
+        function mostrarAlerta(mensaje, tipo) {
+            const alerta = document.createElement('div');
+            alerta.className = `alert ${tipo}`;
+            alerta.textContent = mensaje;
+            
+            document.body.appendChild(alerta);
+            
+            setTimeout(() => {
+                alerta.remove();
+            }, 3000);
+        }
+
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                cerrarModal();
+            }
+        });
+
+        // Cerrar modal al hacer click fuera
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                cerrarModal();
+            }
+        });
+    </script>
+</body>
+</html>

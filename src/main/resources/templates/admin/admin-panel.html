@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubic Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/CSS/panel.css}">
+    <!-- <link rel="stylesheet" href="../../static/CSS/panel.css">  -->
+</head>
+<body>          
+    <!-- Sidebar -->    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <div>
+                <h1>PANEL</h1>
+                <h1>ADMIN</h1>
+            </div>
+            <button class="toggle-btn" id="toggleBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="menu">
+            <li class="active" onclick="showDashboard()">
+                <i class="fas fa-th-large"></i>
+                <span class="menu-text">Dashboard</span>
+                <span class="badge">3</span>
+            </li>
+            <li onclick="loadPage('/admin/historia-clinica/vista-historia', 'Historia Clinica', 'historiaClinicaFrame', this)">
+                <i class="fas fa-file-medical"></i>
+                <span class="menu-text">Historia Clinica</span>
+            <li onclick="loadPage('/admin/tipos-tratamiento/vista-tipo', 'Tipo Tratamiento', 'tipoTratamientoFrame', this)">
+                <i class="fas fa-edit"></i>
+                <span class="menu-text">Tipo Tratamiento</span>
+            </li>
+            <li onclick="loadPage('/admin/tratamientos/formulario', 'Tratamientos', 'tratamientosFrame', this)">
+                <i class="fas fa-table"></i>
+                <span class="menu-text">Tratamientos</span>
+            </li>
+            <li onclick="loadPage('/admin/inscripcion/vista-materia', 'Inscripciones', 'inscripcionFrame', this)">
+                <i class="fas fa-chart-bar"></i>
+                <span class="menu-text">Inscripciones</span>
+            </li>
+            <li onclick="loadPage('/admin/aprobacion/vista-aprobacion', 'Aprobacion', 'aprobacionFrame', this)">
+                <i class="fas fa-th"></i>
+                <span class="menu-text">Aprobacion</span>
+            </li>
+            <li onclick="loadPage('/admin/cupo/vista-cupo', 'Cupos', 'cuposFrame', this)">
+                <i class="fas fa-star"></i>
+                <span class="menu-text">Cupos</span>
+                <span class="badge">0</span>
+            </li>
+        
+        </ul>
+        
+        <div class="user-info">
+            <div class="user-avatar">HG</div>
+            <div class="user-details">
+                <div class="user-name">Hanna Gover</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2 id="pageTitle">Dashboard</h2>
+            <div class="user-menu">
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-cog"></i>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+        
+        <!-- Contenido del Dashboard -->
+        <div id="dashboardContent" class="content-area active">
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">BOOMINGS</div>
+                        <div class="card-icon" style="background: linear-gradient(to right, #6a11cb, #2575fc);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">15.4</div>
+                    <div class="card-footer">Target</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Total</div>
+                        <div class="card-icon" style="background: linear-gradient(to right, #ff9800, #ff5722);">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">68</div>
+                    <div class="card-footer">Pending</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">COMPLAINTS</div>
+                        <div class="card-icon" style="background: linear-gradient(to right, #f44336, #e91e63);">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">$9475</div>
+                    <div class="card-footer">EARNING</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">March : $514578</div>
+                        <div class="card-icon" style="background: linear-gradient(to right, #4caf50, #8bc34a);">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">Report</div>
+                    <div class="card-footer">60%</div>
+                </div>
+            </div>
+            
+            <!-- Charts and Progress -->
+            <div class="charts-progress">
+                <div class="chart-container">
+                    <h3 class="section-title">Statistics</h3>
+                    <div style="height: 200px; background: linear-gradient(to right, rgba(106, 17, 203, 0.1), rgba(37, 117, 252, 0.1)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <p style="color: var(--text-gray);">Chart: New Sales / Existing Sales (Feb 04 - Mar 03)</p>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <h3 class="section-title">Task Progress</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Earnings</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill earnings-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Pending</span>
+                            <span>55%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill pending-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Bookings</span>
+                            <span>50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bookings-progress"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasks Section -->
+            <div class="tasks-section">
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <div class="task-count">05</div>
+                            <div class="task-type">Urgent Tasks</div>
+                        </div>
+                        <div class="task-icon urgent-icon">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                    </div>
+                    <ul class="task-list">
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Complete dashboard design</span>
+                            <div class="task-assignee">HG</div>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Fix responsive issues</span>
+                            <div class="task-assignee">JS</div>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Update documentation</span>
+                            <div class="task-assignee">AB</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <div class="task-count">03</div>
+                            <div class="task-type">Normal Tasks</div>
+                        </div>
+                        <div class="task-icon normal-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                    </div>
+                    <ul class="task-list">
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Review user feedback</span>
+                            <div class="task-assignee">CD</div>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Prepare meeting agenda</span>
+                            <div class="task-assignee">EF</div>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Update team schedule</span>
+                            <div class="task-assignee">GH</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="task-card">
+                    <h3 class="section-title">Assigned To</h3>
+                    <ul class="task-list">
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Hanna Gover - Dashboard redesign</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">John Smith - API integration</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Alex Brown - Database optimization</span>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="task-checkbox">
+                            <span class="task-text">Emily Davis - User testing</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido de Nuevo Paciente -->
+        <div id="nuevoPacienteContent" class="content-area">
+            <iframe id="historiaClinicaFrame" src="about:blank"></iframe>
+        </div>
+        
+        <!-- Contenido de Solicitud de Insumos -->
+        <div id="solicitudInsumosContent" class="content-area">
+            <iframe id="solicitudInsumosFrame" src="about:blank"></iframe>
+        </div>
+
+
+        <!-- Contenido de Tipo Tratamiento -->
+        <div id="tipoTratamientoContent" class="content-area">
+            <iframe id="tipoTratamientoFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Tratamientos -->
+        <div id="tratamientosContent" class="content-area">
+            <iframe id="tratamientosFrame" src="about:blank"></iframe>
+        </div>
+        <div id="inscripcionContent" class="content-area">
+            <iframe id="inscripcionFrame" src="about:blank"></iframe>
+
+        </div>
+
+        <div id="aprobacionContent" class="content-area">
+            <iframe id="aprobacionFrame" src="about:blank"></iframe>
+
+        </div>
+
+        <div id="cuposContent" class="content-area">
+            <iframe id="cuposFrame" src="about:blank"></iframe>
+
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        function showDashboard() {
+            // Ocultar todo el contenido
+            document.querySelectorAll('.content-area').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remover clase active de todos los items del menú
+            document.querySelectorAll('.menu li').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar dashboard
+            document.getElementById('dashboardContent').classList.add('active');
+            document.querySelector('.menu li:nth-child(1)').classList.add('active');
+            document.getElementById('pageTitle').textContent = 'Dashboard';
+        }
+
+        function loadPage(pageUrl, pageTitle, frameId, menuItem) {
+            // Ocultar todo el contenido
+            document.querySelectorAll('.content-area').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remover clase active de todos los items del menú
+            document.querySelectorAll('.menu li').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar el contenido correspondiente
+            if (frameId === 'historiaClinicaFrame') {
+                document.getElementById('nuevoPacienteContent').classList.add('active');
+            } else if (frameId === 'solicitudInsumosFrame') {
+                document.getElementById('solicitudInsumosContent').classList.add('active');
+            } else if (frameId === 'tipoTratamientoFrame') {
+                document.getElementById('tipoTratamientoContent').classList.add('active');
+            } else if (frameId === 'tratamientosFrame') {
+                document.getElementById('tratamientosContent').classList.add('active');
+            } else if (frameId === 'inscripcionFrame') {
+                document.getElementById('inscripcionContent').classList.add('active');
+            } else if (frameId === 'aprobacionFrame') {
+                document.getElementById('aprobacionContent').classList.add('active');
+            } else if (frameId === 'cuposFrame') {
+                document.getElementById('cuposContent').classList.add('active');
+            }
+
+            // Activar el item del menú clickeado
+            // Preferimos el menuItem pasado desde el onclick (this). Si no existe, intentamos usar event como fallback.
+            if (menuItem && menuItem.classList) {
+                menuItem.classList.add('active');
+            } else if (typeof event !== 'undefined' && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+            
+            // Actualizar el título de la página
+            document.getElementById('pageTitle').textContent = pageTitle;
+            
+            // Cargar la página en el iframe correspondiente
+            const frame = document.getElementById(frameId);
+            frame.src = pageUrl;
+        }
+
+        // Simple script to handle checkbox interactions
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskText = this.nextElementSibling;
+                if (this.checked) {
+                    taskText.style.textDecoration = 'line-through';
+                    taskText.style.color = '#aaa';
+                } else {
+                    taskText.style.textDecoration = 'none';
+                    taskText.style.color = '#333';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

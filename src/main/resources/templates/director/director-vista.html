@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubic Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/CSS/panel.css}">
+</head>
+<body>          
+    <!-- Sidebar -->    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <div>
+                <h1>PANEL</h1>
+                <h1>DIRECTORA</h1>
+            </div>
+            <button class="toggle-btn" id="toggleBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="menu">
+            <li onclick="loadPage('/director/solicitud-abastecimiento/abastecimiento-vista', 'Solicitud Abastecimiento', 'abastecimientoFrame', this)">
+                <i class="fas fa-boxes"></i>
+                <span class="menu-text">Solicitud Abastecimiento</span>
+            </li>
+
+            <li onclick="loadPage('/admin/tratamientos/formulario', 'Tratamientos', 'tratamientosFrame', this)">
+                <i class="fas fa-tooth"></i>
+                <span class="menu-text">Tratamientos</span>
+            </li>
+
+            <li onclick="loadPage('/admin/inscripcion/vista-materia', 'Inscripciones', 'inscripcionFrame', this)">
+                <i class="fas fa-user-plus"></i>
+                <span class="menu-text">Inscripciones</span>
+            </li>
+
+            <li onclick="loadPage('/admin/aprobacion/vista-aprobacion', 'Aprobacion', 'aprobacionFrame', this)">
+                <i class="fas fa-check-circle"></i>
+                <span class="menu-text">Aprobacion</span>
+            </li>
+
+            <li onclick="loadPage('/admin/cupo/vista-cupo', 'Cupos', 'cuposFrame', this)">
+                <i class="fas fa-ticket-alt"></i>
+                <span class="menu-text">Cupos</span>
+            </li>
+
+            <li onclick="loadPage('/director/Registro-Docentes/registro_docente', 'Registro Docente', 'registroDocenteFrame', this)">
+                <i class="fas fa-chalkboard-user"></i>
+                <span class="menu-text">Registro Docente</span>
+            </li>
+        </ul>
+        
+        <div class="user-info">
+            <div class="user-avatar">HG</div>
+            <div class="user-details">
+                <div class="user-name">Hanna Gover</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2 id="pageTitle">Solicitud Abastecimiento</h2>
+            <div class="user-menu">
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-cog"></i>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+        
+        <!-- Contenido de Solicitud Abastecimiento -->
+        <div id="abastecimientoContent" class="content-area active">
+            <iframe id="abastecimientoFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Tratamientos -->
+        <div id="tratamientosContent" class="content-area">
+            <iframe id="tratamientosFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Inscripciones -->
+        <div id="inscripcionContent" class="content-area">
+            <iframe id="inscripcionFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Aprobacion -->
+        <div id="aprobacionContent" class="content-area">
+            <iframe id="aprobacionFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Cupos -->
+        <div id="cuposContent" class="content-area">
+            <iframe id="cuposFrame" src="about:blank"></iframe>
+        </div>
+
+        <!-- Contenido de Registro Docente -->
+        <div id="registroDocenteContent" class="content-area">
+            <iframe id="registroDocenteFrame" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        function loadPage(pageUrl, pageTitle, frameId, menuItem) {
+            // Ocultar todo el contenido
+            document.querySelectorAll('.content-area').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remover clase active de todos los items del menú
+            document.querySelectorAll('.menu li').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar el contenido correspondiente según el frameId
+            if (frameId === 'abastecimientoFrame') {
+                document.getElementById('abastecimientoContent').classList.add('active');
+            } else if (frameId === 'tratamientosFrame') {
+                document.getElementById('tratamientosContent').classList.add('active');
+            } else if (frameId === 'inscripcionFrame') {
+                document.getElementById('inscripcionContent').classList.add('active');
+            } else if (frameId === 'aprobacionFrame') {
+                document.getElementById('aprobacionContent').classList.add('active');
+            } else if (frameId === 'cuposFrame') {
+                document.getElementById('cuposContent').classList.add('active');
+            } else if (frameId === 'registroDocenteFrame') {
+                document.getElementById('registroDocenteContent').classList.add('active');
+            }
+            
+            // Activar el item del menú clickeado
+            if (menuItem && menuItem.classList) {
+                menuItem.classList.add('active');
+            }
+            
+            // Actualizar el título de la página
+            document.getElementById('pageTitle').textContent = pageTitle;
+            
+            // Cargar la página en el iframe correspondiente
+            const frame = document.getElementById(frameId);
+            if (frame) {
+                frame.src = pageUrl;
+            }
+        }
+
+        // Cargar la primera página por defecto al iniciar
+        window.onload = function() {
+            const firstMenuItem = document.querySelector('.menu li');
+            if (firstMenuItem) {
+                firstMenuItem.click();
+            }
+        };
+    </script>
+</body>
+</html>

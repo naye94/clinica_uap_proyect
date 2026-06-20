@@ -26,8 +26,9 @@ public class DiagnosticoTratamiento {
     @Column(name = "observaciones")
     private String observaciones;
 
-    @Column(name = "requiere_consentimiento")
-    private Boolean requiereConsentimiento;
+    @Column(name="diente_afectado", length=50)
+    private String dienteAfectado;  
+
 
     @OneToMany(mappedBy = "diagnosticoTratamiento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Consentimiento> consentimientos = new ArrayList<>();

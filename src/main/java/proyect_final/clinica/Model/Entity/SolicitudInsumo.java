@@ -17,8 +17,8 @@ public class SolicitudInsumo {
     private Long idSolicitudInsumo;
 
     @OneToOne
-    @JoinColumn(name = "consentimiento", nullable = false)
-    private Consentimiento consentimiento;
+    @JoinColumn(name = "id_diagnostico_tratamiento", nullable = false)
+    private DiagnosticoTratamiento diagnosticoTratamiento;
 
     @Column(name = "fecha_solicitud", nullable = false, length = 100)
     private LocalDate fechaSolicitud;
