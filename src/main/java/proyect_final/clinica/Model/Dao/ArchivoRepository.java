@@ -11,9 +11,6 @@ public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
     
     // Métodos existentes...
     List<Archivo> findByPacienteIdPaciente(Long idPaciente);
-    Optional<Archivo> findByCodigoArchivo(String codigoArchivo);
-    List<Archivo> findByUbicacionFisicaContainingIgnoreCase(String ubicacion);
-    
     @Query("SELECT a FROM Archivo a WHERE a.paciente.idPaciente = :idPaciente " +
            "AND LOWER(a.codigoArchivo) LIKE LOWER(CONCAT('%', :codigo, '%'))")
     List<Archivo> buscarPorPacienteYCodigo(@Param("idPaciente") Long idPaciente, 
@@ -22,16 +19,9 @@ public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
     @Query("SELECT a FROM Archivo a WHERE a.paciente.idPaciente = :idPaciente ORDER BY a.idArchivo LIMIT 1")
     Optional<Archivo> findPrimerArchivoPorPaciente(@Param("idPaciente") Long idPaciente);
     
-    // ✅ NUEVOS MÉTODOS PARA BUSCAR POR DATOS DEL PACIENTE
-     // ✅ Método único para buscar archivo por CI O nombre del paciente
-    @Query("SELECT a FROM Archivo a WHERE " +
-           "(:ci IS NOT NULL AND CAST(a.paciente.ci AS string) = CAST(:ci AS string)) OR " +
-           "(:nombre IS NOT NULL AND LOWER(CONCAT(a.paciente.persona.nombre, ' ', " +
-           "a.paciente.persona.apellidoPaterno, ' ', " +
-           "a.paciente.persona.apellidoMaterno)) " +
-           "LIKE LOWER(CONCAT('%', REPLACE(:nombre, ' ', '%'), '%')))")
-    Optional<Archivo> findArchivoByPacienteCiOrNombre(@Param("ci") Integer ci, 
-                                                      @Param("nombre") String nombre);
+    @Query(value = "SELECT * FROM buscar_archivo_por_paciente(:ci, :nombre)", nativeQuery = true)
+    Optional<Archivo> buscarArchivoPorCiONombre(@Param("ci") Integer ci, 
+                                                @Param("nombre") String nombre);
     
     // ✅ Método para obtener solo el ID del archivo (más eficiente)
     @Query("SELECT a.idArchivo FROM Archivo a WHERE " +

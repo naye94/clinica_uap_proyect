@@ -47,7 +47,7 @@ public class ArchivoServiceImpl implements ArchivoService {
         // Limpiar el nombre para búsqueda
         String nombreBusqueda = nombre != null ? nombre.trim() : null;
         
-        return archivoRepository.findArchivoByPacienteCiOrNombre(ci, nombreBusqueda);
+        return archivoRepository.buscarArchivoPorCiONombre(ci, nombreBusqueda);
     }
     
     // ✅ Método para obtener solo el ID
