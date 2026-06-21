@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insumos Más Consumidos por Clínica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #006D77;
+      --primary-dark: #005259;
+      --primary-light: #E6F4F5;
+      --success: #10B981;
+      --success-light: #D1FAE5;
+      --warning: #F59E0B;
+      --warning-light: #FEF3C7;
+      --danger: #EF4444;
+      --danger-light: #FEE2E2;
+      --info: #3B82F6;
+      --info-light: #DBEAFE;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --radius: 1rem;
+      --radius-sm: 0.75rem;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(135deg, #F5F7FA 0%, #F0F4F8 100%);
+      color: var(--gray-800);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #006D77 0%, #004d44 100%);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      color: white;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .header .badge-header {
+      background: rgba(255,255,255,0.2);
+      padding: 0.25rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      color: var(--gray-600);
+      font-size: 0.875rem;
+    }
+
+    .stat-card .icon-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .filters-card {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filters-grid {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-group input {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    .filter-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,109,119,0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    .btn-success:hover { background: #0b9e6e; transform: translateY(-1px); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    .btn-danger:hover { background: #dc2626; transform: translateY(-1px); }
+
+    .table-container {
+      background: white;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .table-header-actions .info {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: var(--gray-50);
+      padding: 0.875rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.875rem;
+    }
+
+    tr:hover td {
+      background: var(--gray-50);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-consumo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-consumo.grande {
+      font-size: 0.9rem;
+      padding: 0.4rem 1rem;
+    }
+
+    .badge-clinica {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-turno {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--gray-500);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--gray-300);
+      margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--gray-500);
+    }
+
+    .loading-state .fa-spinner {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fa-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+      .header { padding: 1.5rem; }
+      .header h1 { font-size: 1.4rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .stat-card { padding: 1rem; }
+      .stat-card .number { font-size: 1.5rem; }
+      .filters-grid { flex-direction: column; }
+      .filter-group { min-width: 100%; }
+      .table-header-actions { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+      th, td { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <h1><i class="fas fa-chart-pie"></i> Insumos Más Consumidos</h1>
+    <p>Reporte de insumos más consumidos por clínica y turno</p>
+    <div class="badge-header">
+      <i class="fas fa-calendar-alt"></i> Datos actualizados
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="icon-circle"><i class="fas fa-hospital"></i></div>
+      <div class="number" id="totalClinicas">0</div>
+      <div class="label">Clínicas</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-circle"><i class="fas fa-clock"></i></div>
+      <div class="number" id="totalTurnos">0</div>
+      <div class="label">Turnos</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-circle"><i class="fas fa-syringe"></i></div>
+      <div class="number" id="totalInsumos">0</div>
+      <div class="label">Insumos</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-circle"><i class="fas fa-cubes"></i></div>
+      <div class="number" id="totalConsumido">0</div>
+      <div class="label">Unidades Consumidas</div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label><i class="fas fa-calendar-alt"></i> Fecha Inicio</label>
+        <input type="date" id="fechaInicio">
+      </div>
+      <div class="filter-group">
+        <label><i class="fas fa-calendar-alt"></i> Fecha Fin</label>
+        <input type="date" id="fechaFin">
+      </div>
+      <div class="filter-group" style="flex: 0.5; min-width: 120px;">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="cargarDatos()">
+          <i class="fas fa-search"></i> Filtrar
+        </button>
+      </div>
+      <div class="filter-group" style="flex: 0.5; min-width: 120px;">
+        <label>&nbsp;</label>
+        <button class="btn btn-outline" onclick="limpiarFiltros()">
+          <i class="fas fa-undo"></i> Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-container">
+    <div class="table-header-actions">
+      <div class="info">
+        <i class="fas fa-list"></i> <span id="registrosCount">0</span> registros encontrados
+      </div>
+      <div>
+        <button class="btn btn-outline" onclick="cargarDatos()" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th><i class="fas fa-hospital"></i> Clínica</th>
+          <th><i class="fas fa-clock"></i> Turno</th>
+          <th><i class="fas fa-syringe"></i> Insumo</th>
+          <th style="text-align: right;"><i class="fas fa-cubes"></i> Total Consumido</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody">
+        <tr>
+          <td colspan="4" class="loading-state">
+            <div><i class="fas fa-spinner"></i></div>
+            <p>Cargando datos...</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // CONFIGURACIÓN
+  // ============================================================
+  const API_URL = '/api/insumos/consumo';
+
+  // ============================================================
+  // FUNCIONES PRINCIPALES
+  // ============================================================
+
+  async function cargarDatos() {
+    const tbody = document.getElementById('tablaBody');
+    mostrarLoading(tbody);
+
+    try {
+      const fechaInicio = document.getElementById('fechaInicio').value;
+      const fechaFin = document.getElementById('fechaFin').value;
+
+      let url = API_URL;
+      const params = new URLSearchParams();
+      if (fechaInicio) params.append('fechaInicio', fechaInicio);
+      if (fechaFin) params.append('fechaFin', fechaFin);
+      if (params.toString()) url += '?' + params.toString();
+
+      console.log('📡 Llamando a:', url);
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Error al cargar datos: ' + response.status);
+
+      const data = await response.json();
+      console.log('📦 Datos recibidos:', data);
+
+      renderizarTabla(data);
+      actualizarEstadisticas(data);
+
+    } catch (error) {
+      console.error('❌ Error:', error);
+      mostrarError(tbody, error.message);
+    }
+  }
+
+  // ============================================================
+  // RENDERIZADO
+  // ============================================================
+
+  function renderizarTabla(data) {
+    const tbody = document.getElementById('tablaBody');
+
+    if (!data || data.length === 0) {
+      mostrarVacio(tbody);
+      document.getElementById('registrosCount').textContent = '0';
+      return;
+    }
+
+    document.getElementById('registrosCount').textContent = data.length;
+
+    tbody.innerHTML = data.map((item, index) => `
+      <tr>
+        <td>
+          <span class="badge-clinica">
+            <i class="fas fa-hospital"></i> ${item.clinica || 'SIN CLÍNICA'}
+          </span>
+        </td>
+        <td>
+          <span class="badge-turno">
+            <i class="fas fa-clock"></i> ${item.turno || 'SIN TURNO'}
+          </span>
+        </td>
+        <td>
+          <strong>${item.insumo || 'SIN INSUMO'}</strong>
+        </td>
+        <td style="text-align: right;">
+          <span class="badge-consumo grande">
+            <i class="fas fa-cubes"></i> ${item.totalConsumido || 0}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function actualizarEstadisticas(data) {
+    if (!data || data.length === 0) {
+      document.getElementById('totalClinicas').textContent = '0';
+      document.getElementById('totalTurnos').textContent = '0';
+      document.getElementById('totalInsumos').textContent = '0';
+      document.getElementById('totalConsumido').textContent = '0';
+      return;
+    }
+
+    // Clínicas únicas
+    const clinicas = new Set(data.map(item => item.clinica));
+    document.getElementById('totalClinicas').textContent = clinicas.size;
+
+    // Turnos únicos
+    const turnos = new Set(data.map(item => item.turno));
+    document.getElementById('totalTurnos').textContent = turnos.size;
+
+    // Total de insumos (registros)
+    document.getElementById('totalInsumos').textContent = data.length;
+
+    // Total consumido
+    const total = data.reduce((sum, item) => sum + (item.totalConsumido || 0), 0);
+    document.getElementById('totalConsumido').textContent = total.toLocaleString();
+  }
+
+  // ============================================================
+  // ESTADOS DE LA TABLA
+  // ============================================================
+
+  function mostrarLoading(tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="loading-state">
+          <div><i class="fas fa-spinner"></i></div>
+          <p>Cargando datos...</p>
+        </td>
+      </tr>
+    `;
+  }
+
+  function mostrarVacio(tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state">
+          <div><i class="fas fa-inbox"></i></div>
+          <h3>No hay datos disponibles</h3>
+          <p>No se encontraron registros para el período seleccionado.</p>
+        </td>
+      </tr>
+    `;
+  }
+
+  function mostrarError(tbody, mensaje) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state" style="color: var(--danger);">
+          <div><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i></div>
+          <h3>Error al cargar datos</h3>
+          <p>${mensaje}</p>
+          <button class="btn btn-primary" onclick="cargarDatos()" style="margin-top: 1rem;">
+            <i class="fas fa-sync-alt"></i> Reintentar
+          </button>
+        </td>
+      </tr>
+    `;
+  }
+
+  // ============================================================
+  // UTILIDADES
+  // ============================================================
+
+  function limpiarFiltros() {
+    document.getElementById('fechaInicio').value = '';
+    document.getElementById('fechaFin').value = '';
+    cargarDatos();
+  }
+
+  function obtenerFechaPorDefecto(diasAtras) {
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() - diasAtras);
+    return fecha.toISOString().split('T')[0];
+  }
+
+  // ============================================================
+  // INICIALIZACIÓN
+  // ============================================================
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fechas por defecto: últimos 30 días
+    document.getElementById('fechaInicio').value = obtenerFechaPorDefecto(30);
+    document.getElementById('fechaFin').value = obtenerFechaPorDefecto(0);
+
+    // Cargar datos al inicio
+    cargarDatos();
+  });
+</script>
+</body>
+</html>

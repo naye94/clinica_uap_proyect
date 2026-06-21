@@ -52,53 +52,17 @@ public class ConsentimientoController {
         try {
             Long idDiagnostico = Long.parseLong(criterio.trim());
             
-            Optional<Diagnostico> diagnosticoOpt = diagnosticoService
-                .buscarPorIdConFuncionDiagnostico(idDiagnostico);
-            
-            if (diagnosticoOpt.isEmpty()) {
-                return ResponseEntity.ok(Collections.emptyList());
-            }
-            
-            Diagnostico diagnostico = diagnosticoOpt.get();
-            Map<String, Object> resultado = new HashMap<>();
-            
-            resultado.put("idDiagnostico", diagnostico.getIdDiagnostico());
-            resultado.put("descripcionDiagnostico", diagnostico.getDescripcion());
-            
-            if (diagnostico.getConsulta() != null && 
-                diagnostico.getConsulta().getPaciente() != null) {
-                Paciente paciente = diagnostico.getConsulta().getPaciente();
-                resultado.put("idPaciente", paciente.getIdPaciente());
-                resultado.put("ci", paciente.getCi());
-                
-                if (paciente.getPersona() != null) {
-                    Persona persona = paciente.getPersona();
-                    resultado.put("nombrePaciente", 
-                        persona.getNombre() + " " + persona.getApellidoPaterno() + " " + persona.getApellidoMaterno());
-                }
-            }
-            
-            List<DiagnosticoTratamiento> diagTrats = diagnosticoTratamientoService
-                .findByDiagnosticoId(diagnostico.getIdDiagnostico());
-            
-            if (!diagTrats.isEmpty()) {
-                List<Map<String, Object>> tratamientos = diagTrats.stream()
-                    .map(dt -> {
-                        Map<String, Object> t = new HashMap<>();
-                        t.put("idDiagTrat", dt.getIdDiagTrat());
-                        t.put("nombreTratamiento", dt.getTratamiento().getNombreTratamiento());
-                        t.put("observaciones", dt.getObservaciones());
-                        t.put("dienteAfectado", dt.getDienteAfectado());
-                        return t;
-                    })
-                    .collect(Collectors.toList());
-                resultado.put("diagnosticoTratamientos", tratamientos);
-            }
+            // El Service hace TODO el trabajo
+            Map<String, Object> resultado = diagnosticoService
+                .buscarDiagnosticoFormateado(idDiagnostico);
             
             return ResponseEntity.ok(List.of(resultado));
             
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("El ID debe ser un número válido");
+        } catch (RuntimeException e) {
+            // Diagnóstico no encontrado
+            return ResponseEntity.ok(Collections.emptyList());
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                 .body("Error al buscar diagnóstico: " + e.getMessage());

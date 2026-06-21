@@ -2,7 +2,8 @@
 
     import proyect_final.clinica.Model.Entity.Diagnostico;
     import java.util.List;
-    import java.util.Optional;
+import java.util.Map;
+import java.util.Optional;
 
     public interface DiagnosticoService {
         
@@ -15,5 +16,8 @@
         void eliminar(Long id);
             // ===== BUSCAR POR FUNCIÓN SQL =====
         Optional<Diagnostico> buscarPorIdConFuncionDiagnostico(Long idDiagnostico);
-        
-    }
+
+            //  Retorna DTO con datos 
+        Map<String, Object> buscarDiagnosticoFormateado(Long idDiagnostico);
+}
+    

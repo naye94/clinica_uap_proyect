@@ -26,4 +26,9 @@ public class EncargadoViewController {
     public String mostrarSolicitudAbastecimiento() {
         return "encargado_insumos/solicitud-abastecimiento/abastecimiento-vista";
     }
+
+    @GetMapping("/consumido_insumo/consumido-vista")
+    public String mostrarInsumosConsumidos() {
+        return "encargado_insumos/consumido_insumo/consumido-vista";
+    }
 }   

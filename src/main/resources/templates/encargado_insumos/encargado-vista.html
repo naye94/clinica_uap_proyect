@@ -35,6 +35,10 @@
                 <i class="fas fa-truck"></i>
                 <span class="menu-text">Solicitud Abastecimiento</span>
             </li>
+            <li onclick="loadPage('/encargado_insumo/consumido_insumo/consumido-vista', 'Total de insumos consumidos por clinica', 'consumidoFrame', this)">
+                <i class="fas fa-truck"></i>
+                <span class="menu-text">Insumos Consumidos</span>
+            </li>
         </ul>
         
         <div class="user-info">
@@ -70,6 +74,10 @@
         <div id="abastecimientoContent" class="content-area">
             <iframe id="abastecimientoFrame" src="about:blank"></iframe>
         </div>
+
+        <div id="consumidoContent" class="content-area">
+            <iframe id="consumidoFrame" src="about:blank"></iframe>
+        </div>
     </div>
 
     <script>
@@ -99,6 +107,8 @@
                 document.getElementById('solicitudPedidoContent').classList.add('active');
             } else if (frameId === 'SoliEstudianteFrame') {
                 document.getElementById('SoliEstudianteContent').classList.add('active');
+            } else if (frameId === 'consumidoFrame') {
+                document.getElementById('consumidoContent').classList.add('active');
             }
             
             // Activar el item del menú clickeado
